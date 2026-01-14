@@ -1,0 +1,90 @@
+{
+  "project": "Task Management System",
+  "feature": "Task Priority System",
+  "branchName": "feature/task-priority",
+  "repos": {
+    "backend": "https://github.com/example/backend-repo.git",
+    "mobile": "https://github.com/example/mobile-repo.git"
+  },
+  "userStories": [
+    {
+      "id": "US-001",
+      "repo": "backend",
+      "title": "Add priority field to tasks table",
+      "description": "As a developer, I need to add a priority field (low, medium, high) to the tasks table in the database so that tasks can be categorized by importance.",
+      "acceptanceCriteria": [
+        "A migration is created to add a 'priority' enum column to the 'tasks' table",
+        "The enum values are: 'low', 'medium', 'high'",
+        "The default priority for new tasks is 'medium'",
+        "The migration can be rolled back cleanly",
+        "All existing tests must pass"
+      ],
+      "priority": 1,
+      "status": "pending",
+      "dependencies": []
+    },
+    {
+      "id": "US-002",
+      "repo": "backend",
+      "title": "Update Task model to include priority field",
+      "description": "As a developer, I need to update the Task model to include the priority field in its fillable attributes and ensure proper casting.",
+      "acceptanceCriteria": [
+        "The 'priority' field is added to the $fillable array",
+        "The Task model properly handles the priority enum",
+        "The model returns the correct priority value when accessed",
+        "All existing tests must pass"
+      ],
+      "priority": 2,
+      "status": "pending",
+      "dependencies": ["US-001"]
+    },
+    {
+      "id": "US-003",
+      "repo": "backend",
+      "title": "Add priority validation to task creation API",
+      "description": "As a backend developer, I need to add validation for the priority field when creating or updating tasks through the API.",
+      "acceptanceCriteria": [
+        "A form request is created or updated to validate the priority field",
+        "The priority field is optional during creation (defaults to 'medium')",
+        "Only valid enum values ('low', 'medium', 'high') are accepted",
+        "Appropriate error messages are returned for invalid values",
+        "API tests are added to verify validation"
+      ],
+      "priority": 3,
+      "status": "pending",
+      "dependencies": ["US-002"]
+    },
+    {
+      "id": "US-004",
+      "repo": "mobile",
+      "title": "Display priority indicator in task list",
+      "description": "As a mobile user, I want to see a visual indicator of task priority in the task list so I can quickly identify important tasks.",
+      "acceptanceCriteria": [
+        "A priority badge is displayed on each task card",
+        "The badge color matches the priority: red (high), yellow (medium), green (low)",
+        "The badge shows the priority text ('High', 'Medium', 'Low')",
+        "The UI is responsive and works on both iOS and Android",
+        "The component is properly typed with TypeScript"
+      ],
+      "priority": 4,
+      "status": "pending",
+      "dependencies": ["US-003"]
+    },
+    {
+      "id": "US-005",
+      "repo": "mobile",
+      "title": "Add priority selector to task creation form",
+      "description": "As a mobile user, I want to select a priority level when creating a new task so I can categorize its importance.",
+      "acceptanceCriteria": [
+        "A priority selector (dropdown or segmented control) is added to the create task form",
+        "The selector shows all three priority options",
+        "The default selection is 'Medium'",
+        "The selected priority is sent to the API when creating the task",
+        "The UI follows the app's design system"
+      ],
+      "priority": 5,
+      "status": "pending",
+      "dependencies": ["US-003"]
+    }
+  ]
+}

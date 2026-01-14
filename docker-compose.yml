@@ -1,0 +1,203 @@
+version: '3.8'
+
+services:
+  # Redis for task queue
+  redis:
+    image: redis:7-alpine
+    container_name: ralph-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # PostgreSQL database (optional, can use SQLite)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: ralph-postgres
+  #   environment:
+  #     POSTGRES_DB: ralph_advanced
+  #     POSTGRES_USER: ralph
+  #     POSTGRES_PASSWORD: ralph_password
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+
+  # Orchestrator (FastAPI backend)
+  orchestrator:
+    build:
+      context: ./orchestrator
+      dockerfile: Dockerfile
+    container_name: ralph-orchestrator
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      # - DATABASE_URL=postgresql://ralph:ralph_password@postgres:5432/ralph_advanced
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=ralph-advanced-secret-key-change-in-production
+      - API_PROVIDER=manus
+      - MANUS_API_KEY=${MANUS_API_KEY}
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+    volumes:
+      - ./state:/app/state
+      - ./repos:/app/repos
+      - ./agents:/app/agents
+      - db_data:/app
+    depends_on:
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Worker pool - Backend
+  worker-backend:
+    build:
+      context: ./workers
+      dockerfile: Dockerfile
+    container_name: ralph-worker-backend
+    command: python start_worker.py backend
+    environment:
+      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - API_PROVIDER=manus
+      - MANUS_API_KEY=${MANUS_API_KEY}
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+    volumes:
+      - ./state:/app/state
+      - ./repos:/app/repos
+      - ./agents:/app/agents
+      - db_data:/app
+    depends_on:
+      - redis
+      - orchestrator
+    restart: unless-stopped
+
+  # Worker pool - Mobile
+  worker-mobile:
+    build:
+      context: ./workers
+      dockerfile: Dockerfile
+    container_name: ralph-worker-mobile
+    command: python start_worker.py mobile
+    environment:
+      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - API_PROVIDER=manus
+      - MANUS_API_KEY=${MANUS_API_KEY}
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+    volumes:
+      - ./state:/app/state
+      - ./repos:/app/repos
+      - ./agents:/app/agents
+      - db_data:/app
+    depends_on:
+      - redis
+      - orchestrator
+    restart: unless-stopped
+
+  # Worker pool - QA
+  worker-qa:
+    build:
+      context: ./workers
+      dockerfile: Dockerfile
+    container_name: ralph-worker-qa
+    command: python start_worker.py qa
+    environment:
+      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - API_PROVIDER=manus
+      - MANUS_API_KEY=${MANUS_API_KEY}
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+    volumes:
+      - ./state:/app/state
+      - ./repos:/app/repos
+      - ./agents:/app/agents
+      - db_data:/app
+    depends_on:
+      - redis
+      - orchestrator
+    restart: unless-stopped
+
+  # Worker pool - Code Review
+  worker-code-review:
+    build:
+      context: ./workers
+      dockerfile: Dockerfile
+    container_name: ralph-worker-code-review
+    command: python start_worker.py code_review
+    environment:
+      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - API_PROVIDER=manus
+      - MANUS_API_KEY=${MANUS_API_KEY}
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+    volumes:
+      - ./state:/app/state
+      - ./repos:/app/repos
+      - ./agents:/app/agents
+      - db_data:/app
+    depends_on:
+      - redis
+      - orchestrator
+    restart: unless-stopped
+
+  # Worker pool - Security
+  worker-security:
+    build:
+      context: ./workers
+      dockerfile: Dockerfile
+    container_name: ralph-worker-security
+    command: python start_worker.py security
+    environment:
+      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - API_PROVIDER=manus
+      - MANUS_API_KEY=${MANUS_API_KEY}
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+    volumes:
+      - ./state:/app/state
+      - ./repos:/app/repos
+      - ./agents:/app/agents
+      - db_data:/app
+    depends_on:
+      - redis
+      - orchestrator
+    restart: unless-stopped
+
+  # Web UI (React + Nginx)
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: ralph-ui
+    ports:
+      - "80:80"
+    depends_on:
+      - orchestrator
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  # postgres_data:
+  db_data:
+
+networks:
+  default:
+    name: ralph-network
