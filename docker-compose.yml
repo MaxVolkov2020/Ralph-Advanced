@@ -39,19 +39,20 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - DATABASE_URL=sqlite:///./data/ralph_advanced.db
       # - DATABASE_URL=postgresql://ralph:ralph_password@postgres:5432/ralph_advanced
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - SECRET_KEY=ralph-advanced-secret-key-change-in-production
-      - API_PROVIDER=manus
+      - SECRET_KEY=${SECRET_KEY:-ralph-advanced-secret-key-change-in-production}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - API_PROVIDER=${API_PROVIDER:-manus}
       - MANUS_API_KEY=${MANUS_API_KEY}
       - CLAUDE_API_KEY=${CLAUDE_API_KEY}
     volumes:
       - ./state:/app/state
       - ./repos:/app/repos
       - ./agents:/app/agents
-      - db_data:/app
+      - db_data:/app/data/data
     depends_on:
       - redis
     restart: unless-stopped
@@ -69,17 +70,18 @@ services:
     container_name: ralph-worker-backend
     command: python start_worker.py backend
     environment:
-      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - DATABASE_URL=sqlite:///./data/ralph_advanced.db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - API_PROVIDER=manus
+      - API_PROVIDER=${API_PROVIDER:-manus}
       - MANUS_API_KEY=${MANUS_API_KEY}
       - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
       - ./state:/app/state
       - ./repos:/app/repos
       - ./agents:/app/agents
-      - db_data:/app
+      - db_data:/app/data
     depends_on:
       - redis
       - orchestrator
@@ -93,17 +95,18 @@ services:
     container_name: ralph-worker-mobile
     command: python start_worker.py mobile
     environment:
-      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - DATABASE_URL=sqlite:///./data/ralph_advanced.db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - API_PROVIDER=manus
+      - API_PROVIDER=${API_PROVIDER:-manus}
       - MANUS_API_KEY=${MANUS_API_KEY}
       - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
       - ./state:/app/state
       - ./repos:/app/repos
       - ./agents:/app/agents
-      - db_data:/app
+      - db_data:/app/data
     depends_on:
       - redis
       - orchestrator
@@ -117,17 +120,18 @@ services:
     container_name: ralph-worker-qa
     command: python start_worker.py qa
     environment:
-      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - DATABASE_URL=sqlite:///./data/ralph_advanced.db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - API_PROVIDER=manus
+      - API_PROVIDER=${API_PROVIDER:-manus}
       - MANUS_API_KEY=${MANUS_API_KEY}
       - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
       - ./state:/app/state
       - ./repos:/app/repos
       - ./agents:/app/agents
-      - db_data:/app
+      - db_data:/app/data
     depends_on:
       - redis
       - orchestrator
@@ -141,17 +145,18 @@ services:
     container_name: ralph-worker-code-review
     command: python start_worker.py code_review
     environment:
-      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - DATABASE_URL=sqlite:///./data/ralph_advanced.db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - API_PROVIDER=manus
+      - API_PROVIDER=${API_PROVIDER:-manus}
       - MANUS_API_KEY=${MANUS_API_KEY}
       - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
       - ./state:/app/state
       - ./repos:/app/repos
       - ./agents:/app/agents
-      - db_data:/app
+      - db_data:/app/data
     depends_on:
       - redis
       - orchestrator
@@ -165,17 +170,18 @@ services:
     container_name: ralph-worker-security
     command: python start_worker.py security
     environment:
-      - DATABASE_URL=sqlite:///./ralph_advanced.db
+      - DATABASE_URL=sqlite:///./data/ralph_advanced.db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - API_PROVIDER=manus
+      - API_PROVIDER=${API_PROVIDER:-manus}
       - MANUS_API_KEY=${MANUS_API_KEY}
       - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
       - ./state:/app/state
       - ./repos:/app/repos
       - ./agents:/app/agents
-      - db_data:/app
+      - db_data:/app/data
     depends_on:
       - redis
       - orchestrator
@@ -188,7 +194,7 @@ services:
       dockerfile: Dockerfile
     container_name: ralph-ui
     ports:
-      - "80:80"
+      - "5555:80"
     depends_on:
       - orchestrator
     restart: unless-stopped

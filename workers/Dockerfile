@@ -14,11 +14,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY *.py ./
 
-# Copy agent prompts
-COPY ../agents /app/agents
-
-# Create necessary directories
-RUN mkdir -p /app/repos
+# Create necessary directories (agents mounted via docker-compose volumes)
+RUN mkdir -p /app/repos /app/agents /app/data
 
 # Run worker
 CMD ["python", "start_worker.py", "all"]

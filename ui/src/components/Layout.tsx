@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '../store';
-import { Home, Folder, LogOut, Activity } from 'lucide-react';
+import { Home, Folder, LogOut, Activity, Bot, FileSearch, Settings } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,6 +14,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigation = [
     { name: 'Dashboard', path: '/', icon: Home },
     { name: 'Projects', path: '/projects', icon: Folder },
+    { name: 'Agent Prompts', path: '/prompts', icon: Bot },
+    { name: 'PRD Analysis', path: '/prd-analysis', icon: FileSearch },
+    { name: 'Settings', path: '/settings', icon: Settings },
   ];
 
   const handleLogout = () => {
@@ -52,7 +55,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {navigation.map((item) => {
-              const isActive = location.pathname === item.path;
+              // Check for exact match or if current path starts with the nav path (for nested routes)
+              const isActive = item.path === '/'
+                ? location.pathname === '/'
+                : location.pathname.startsWith(item.path);
               const Icon = item.icon;
               return (
                 <Link

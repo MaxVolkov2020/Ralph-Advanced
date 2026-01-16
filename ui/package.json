@@ -18,7 +18,9 @@
     "@hello-pangea/dnd": "^16.5.0",
     "recharts": "^2.10.3",
     "lucide-react": "^0.303.0",
-    "date-fns": "^3.0.6"
+    "date-fns": "^3.0.6",
+    "react-hot-toast": "^2.4.1",
+    "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

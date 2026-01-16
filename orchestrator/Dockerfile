@@ -5,6 +5,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
@@ -15,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY *.py ./
 
 # Create necessary directories
-RUN mkdir -p /app/repos /app/state
+RUN mkdir -p /app/repos /app/state /app/scripts /app/data
 
 # Expose port
 EXPOSE 8000

@@ -5,7 +5,12 @@ import apiClient from './api/client';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Projects } from './pages/Projects';
+import { CodebaseSettings } from './pages/CodebaseSettings';
+import { Prompts } from './pages/Prompts';
+import { PRDAnalysis } from './pages/PRDAnalysis';
+import { Settings } from './pages/Settings';
 import { Layout } from './components/Layout';
+import { NotificationSystem } from './components/NotificationSystem';
 
 function App() {
   const { isAuthenticated, setUser } = useStore();
@@ -38,7 +43,9 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
+    <>
+      <NotificationSystem />
+      <BrowserRouter>
       <Routes>
         <Route
           path="/login"
@@ -52,6 +59,11 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/projects" element={<Projects />} />
+                  <Route path="/projects/:projectId" element={<Projects />} />
+                  <Route path="/projects/:projectId/codebases" element={<CodebaseSettings />} />
+                  <Route path="/prompts" element={<Prompts />} />
+                  <Route path="/prd-analysis" element={<PRDAnalysis />} />
+                  <Route path="/settings" element={<Settings />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </Layout>
@@ -62,6 +74,7 @@ function App() {
         />
       </Routes>
     </BrowserRouter>
+    </>
   );
 }
 
